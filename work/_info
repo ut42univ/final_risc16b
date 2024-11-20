@@ -1,0 +1,107 @@
+m255
+K4
+z2
+!s11f MIXED_VERSIONS
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/home/mother/b122012/experiment4/final_risc16b
+valu16
+Z1 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z2 !s110 1732064061
+!i10b 1
+!s100 7jDnN[VX2S7IZNQ?2MG]82
+Z3 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I6C@gT?SCL<2L<6QR@<85c2
+Z4 VDg1SIo80bB@j0V0VzS_@n1
+S1
+R0
+Z5 w1731992056
+Z6 8risc16b.sv
+Z7 Frisc16b.sv
+!i122 6
+L0 232 25
+Z8 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z9 !s108 1732064061.000000
+!s107 risc16b.sv|sim_risc16b.sv|
+Z10 !s90 sim_risc16b.sv|risc16b.sv|
+!i113 1
+Z11 tCvgOpt 0
+vreg_file
+R1
+R2
+!i10b 1
+!s100 h2ZbK[hiQ7k[7lK4e>eI13
+R3
+Ie]1APD`c;e2BOIK7KnQMQ1
+R4
+S1
+R0
+R5
+R6
+R7
+!i122 6
+L0 208 22
+R8
+r1
+!s85 0
+31
+R9
+Z12 !s107 risc16b.sv|sim_risc16b.sv|
+R10
+!i113 1
+R11
+vrisc16b
+R1
+R2
+!i10b 1
+!s100 l3XNTZcfN`I_`oTZd59bD1
+R3
+I=QV8aXLbZjN:BiMDGFNkR1
+R4
+S1
+R0
+R5
+R6
+R7
+!i122 6
+L0 3 203
+R8
+r1
+!s85 0
+31
+R9
+R12
+R10
+!i113 1
+R11
+vsim_risc16b
+R1
+R2
+!i10b 1
+!s100 URI<Ukio]DcSUjBiFYD7M0
+R3
+IRgfzT5MzjM4mKD3]PC8cg0
+R4
+S1
+R0
+w1728954282
+8sim_risc16b.sv
+Fsim_risc16b.sv
+!i122 6
+L0 4 124
+R8
+r1
+!s85 0
+31
+R9
+R12
+R10
+!i113 1
+R11

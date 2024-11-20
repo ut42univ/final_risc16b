@@ -1,0 +1,209 @@
+# vsim -c sim_risc16b -l sim_risc16b.log -wlf sim_risc16b.wlf -do "add wave -r /sim_risc16b/risc16b_inst/*; run -all" 
+# Start time: 09:37:38 on Nov 20,2024
+# Loading sv_std.std
+# Loading work.sim_risc16b
+# Loading work.risc16b
+# Loading work.alu16
+# Loading work.reg_file
+# add wave -r /sim_risc16b/risc16b_inst/*
+#  run -all
+# ==== clock: 0 ====
+#  if_pc= 0000  if_ir= 0000000000000000 (0000)
+#  i_addr= 0000  i_din= 3040  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0000000000000000 (0000)
+#  id_imm_reg= 0000  id_pc= 0000
+#  reg_file_rnum1= 0, reg_file_rnum2= 0
+#  ex_result_reg= 0000  ex_ir= 0000000000000000 (0000)
+#  alu_ain= 0000  alu_bin= 0000  alu_op= 0000  alu_dout= 0000
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 0000  reg_file_we= 0
+#  if_pc_bta= 0000  if_pc_we= 0  led= 0000
+# 
+#  regs: 0000 0000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 1 ====
+#  if_pc= 0002  if_ir= 0011000001000000 (3040)
+#  i_addr= 0002  i_din= 3180  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0000000000000000 (0000)
+#  id_imm_reg= 0000  id_pc= 0000
+#  reg_file_rnum1= 0, reg_file_rnum2= 2
+#  ex_result_reg= 0000  ex_ir= 0000000000000000 (0000)
+#  alu_ain= 0000  alu_bin= 0000  alu_op= 0000  alu_dout= 0000
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 0000  reg_file_we= 0
+#  if_pc_bta= 0000  if_pc_we= 0  led= 0000
+# 
+#  regs: 0000 0000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 2 ====
+#  if_pc= 0004  if_ir= 0011000110000000 (3180)
+#  i_addr= 0004  i_din= 32c0  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0011000001000000 (3040)
+#  id_imm_reg= 0040  id_pc= 0002
+#  reg_file_rnum1= 1, reg_file_rnum2= 4
+#  ex_result_reg= 0000  ex_ir= 0000000000000000 (0000)
+#  alu_ain= 0000  alu_bin= 0040  alu_op= 0110  alu_dout= 4000
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 0000  reg_file_we= 0
+#  if_pc_bta= 0000  if_pc_we= 0  led= 0000
+# 
+#  regs: 0000 0000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 3 ====
+#  if_pc= 0006  if_ir= 0011001011000000 (32c0)
+#  i_addr= 0006  i_din= 0333  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0011000110000000 (3180)
+#  id_imm_reg= 0080  id_pc= 0004
+#  reg_file_rnum1= 2, reg_file_rnum2= 6
+#  ex_result_reg= 4000  ex_ir= 0011000001000000 (3040)
+#  alu_ain= 0000  alu_bin= 0080  alu_op= 0110  alu_dout= 8000
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 4000  reg_file_we= 1
+#  if_pc_bta= 4000  if_pc_we= 0  led= 0000
+# 
+#  regs: 0000 0000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 4 ====
+#  if_pc= 0008  if_ir= 0000001100110011 (0333)
+#  i_addr= 0008  i_din= 0cff  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0011001011000000 (32c0)
+#  id_imm_reg= 00c0  id_pc= 0006
+#  reg_file_rnum1= 3, reg_file_rnum2= 1
+#  ex_result_reg= 8000  ex_ir= 0011000110000000 (3180)
+#  alu_ain= 0000  alu_bin= 00c0  alu_op= 0110  alu_dout= c000
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 1  reg_file_din= 8000  reg_file_we= 1
+#  if_pc_bta= 8000  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 0000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 5 ====
+#  if_pc= 000a  if_ir= 0000110011111111 (0cff)
+#  i_addr= 000a  i_din= 0465  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 8000  id_ir= 0000001100110011 (0333)
+#  id_imm_reg= 0033  id_pc= 0008
+#  reg_file_rnum1= 4, reg_file_rnum2= 7
+#  ex_result_reg= c000  ex_ir= 0011001011000000 (32c0)
+#  alu_ain= 0000  alu_bin= 8000  alu_op= 0011  alu_dout= 8000
+#  d_addr= 8000 d_din= a2a2  d_dout= 0000  d_oe= 1  d_we= 00
+#  reg_file_wnum= 2  reg_file_din= c000  reg_file_we= 1
+#  if_pc_bta= c000  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 0000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 6 ====
+#  if_pc= 000c  if_ir= 0000010001100101 (0465)
+#  i_addr= 000c  i_din= 0452  i_oe= 1
+#  id_operand_reg1= 0000  id_operand_reg2= 0000  id_ir= 0000110011111111 (0cff)
+#  id_imm_reg= 00ff  id_pc= 000a
+#  reg_file_rnum1= 4, reg_file_rnum2= 3
+#  ex_result_reg= 00a2  ex_ir= 0000001100110011 (0333)
+#  alu_ain= 0000  alu_bin= 00ff  alu_op= 0001  alu_dout= 00ff
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 3  reg_file_din= 00a2  reg_file_we= 1
+#  if_pc_bta= 00a2  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 c000 0000 0000 0000 0000 0000
+# 
+# ==== clock: 7 ====
+#  if_pc= 000e  if_ir= 0000010001010010 (0452)
+#  i_addr= 000e  i_din= 2101  i_oe= 1
+#  id_operand_reg1= 00ff  id_operand_reg2= 00a2  id_ir= 0000010001100101 (0465)
+#  id_imm_reg= 0065  id_pc= 000c
+#  reg_file_rnum1= 4, reg_file_rnum2= 2
+#  ex_result_reg= 00ff  ex_ir= 0000110011111111 (0cff)
+#  alu_ain= 00ff  alu_bin= 00a2  alu_op= 0101  alu_dout= 005d
+#  d_addr= 00a2 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 4  reg_file_din= 00ff  reg_file_we= 1
+#  if_pc_bta= 00ff  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 c000 00a2 0000 0000 0000 0000
+# 
+# ==== clock: 8 ====
+#  if_pc= 0010  if_ir= 0010000100000001 (2101)
+#  i_addr= 0010  i_din= 20ff  i_oe= 1
+#  id_operand_reg1= 005d  id_operand_reg2= c000  id_ir= 0000010001010010 (0452)
+#  id_imm_reg= 0052  id_pc= 000e
+#  reg_file_rnum1= 1, reg_file_rnum2= 0
+#  ex_result_reg= 005d  ex_ir= 0000010001100101 (0465)
+#  alu_ain= 005d  alu_bin= c000  alu_op= 0010  alu_dout= 3fff
+#  d_addr= c000 d_din= zzzz  d_dout= 5d00  d_oe= 0  d_we= 01
+#  reg_file_wnum= 4  reg_file_din= 005d  reg_file_we= 1
+#  if_pc_bta= 005d  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 c000 00a2 00ff 0000 0000 0000
+# 
+# ==== clock: 9 ====
+#  if_pc= 0012  if_ir= 0010000011111111 (20ff)
+#  i_addr= 0012  i_din= 88f2  i_oe= 1
+#  id_operand_reg1= 8000  id_operand_reg2= 4000  id_ir= 0010000100000001 (2101)
+#  id_imm_reg= 0001  id_pc= 0010
+#  reg_file_rnum1= 0, reg_file_rnum2= 7
+#  ex_result_reg= 3fff  ex_ir= 0000010001010010 (0452)
+#  alu_ain= 8000  alu_bin= 0001  alu_op= 0100  alu_dout= 8001
+#  d_addr= 4000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 4  reg_file_din= 3fff  reg_file_we= 0
+#  if_pc_bta= 3fff  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 c000 00a2 005d 0000 0000 0000
+# 
+# ==== clock: 10 ====
+#  if_pc= 0014  if_ir= 1000100011110010 (88f2)
+#  i_addr= 0014  i_din= 2201  i_oe= 1
+#  id_operand_reg1= 4000  id_operand_reg2= 0000  id_ir= 0010000011111111 (20ff)
+#  id_imm_reg= ffff  id_pc= 0012
+#  reg_file_rnum1= 0, reg_file_rnum2= 7
+#  ex_result_reg= 8001  ex_ir= 0010000100000001 (2101)
+#  alu_ain= 4000  alu_bin= ffff  alu_op= 0100  alu_dout= 3fff
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 1  reg_file_din= 8001  reg_file_we= 1
+#  if_pc_bta= 8001  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8000 c000 00a2 005d 0000 0000 0000
+# 
+# ==== clock: 11 ====
+#  if_pc= 0016  if_ir= 0010001000000001 (2201)
+#  i_addr= 0016  i_din= c7fe  i_oe= 1
+#  id_operand_reg1= 3fff  id_operand_reg2= 0000  id_ir= 1000100011110010 (88f2)
+#  id_imm_reg= fff2  id_pc= 0014
+#  reg_file_rnum1= 2, reg_file_rnum2= 0
+#  ex_result_reg= 3fff  ex_ir= 0010000011111111 (20ff)
+#  alu_ain= 0014  alu_bin= fff2  alu_op= 0100  alu_dout= 0006
+#  d_addr= 0000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 3fff  reg_file_we= 1
+#  if_pc_bta= 3fff  if_pc_we= 0  led= 0000
+# 
+#  regs: 4000 8001 c000 00a2 005d 0000 0000 0000
+# 
+# ==== clock: 12 ====
+#  if_pc= 0018  if_ir= 1100011111111110 (c7fe)
+#  i_addr= 0018  i_din= 0000  i_oe= 1
+#  id_operand_reg1= c000  id_operand_reg2= 4000  id_ir= 0010001000000001 (2201)
+#  id_imm_reg= 0001  id_pc= 0016
+#  reg_file_rnum1= 7, reg_file_rnum2= 7
+#  ex_result_reg= 0006  ex_ir= 1000100011110010 (88f2)
+#  alu_ain= c000  alu_bin= 0001  alu_op= 0100  alu_dout= c001
+#  d_addr= 4000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 0006  reg_file_we= 0
+#  if_pc_bta= 0006  if_pc_we= 1  led= 0000
+# 
+#  regs: 3fff 8001 c000 00a2 005d 0000 0000 0000
+# 
+# ==== clock: 12 ====
+#  if_pc= 0018  if_ir= 1100011111111110 (c7fe)
+#  i_addr= 0018  i_din= 0000  i_oe= 1
+#  id_operand_reg1= c000  id_operand_reg2= 4000  id_ir= 0010001000000001 (2201)
+#  id_imm_reg= 0001  id_pc= 0016
+#  reg_file_rnum1= 7, reg_file_rnum2= 7
+#  ex_result_reg= 0006  ex_ir= 1000100011110010 (88f2)
+#  alu_ain= c000  alu_bin= 0001  alu_op= 0100  alu_dout= c001
+#  d_addr= 4000 d_din= zzzz  d_dout= 0000  d_oe= 0  d_we= 00
+#  reg_file_wnum= 0  reg_file_din= 0006  reg_file_we= 0
+#  if_pc_bta= 0006  if_pc_we= 1  led= 0000
+# 
+#  regs: 3fff 8001 c000 00a2 005d 0000 0000 0000
+# 
+# ** Note: $finish    : sim_risc16b.sv(125)
+#    Time: 270 ns  Iteration: 0  Instance: /sim_risc16b
+# End time: 09:37:38 on Nov 20,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
