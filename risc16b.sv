@@ -1,24 +1,30 @@
 `default_nettype none
 
 module risc16b (
-    input wire clk,
-    input wire rst,
-    output logic [15:0] i_addr,
-    output logic i_oe,
-    input wire [15:0] i_din,
-    output logic [15:0] d_addr,
-    output logic d_oe,
-    input wire [15:0] d_din,
-    output logic [15:0] d_dout,
-    output logic [1:0] d_we
+    input   wire          clk,
+    input   wire          rst,
+    // 命令メモリインターフェース
+    output  logic  [15:0] i_addr,
+    output  logic         i_oe,
+    input   wire   [15:0] i_din,
+    // データメモリインターフェース
+    output  logic  [15:0] d_addr,
+    output  logic         d_oe,
+    input   wire   [15:0] d_din,
+    output  logic  [15:0] d_dout,
+    output  logic  [1:0]  d_we
 );
 
+  // ALU信号の宣言
   logic [15:0] alu_ain, alu_bin, alu_dout;
   logic [3:0] alu_op;
+
+  // レジスタファイル信号の宣言
   logic [2:0] reg_file_rnum1, reg_file_rnum2, reg_file_wnum;
   logic [15:0] reg_file_dout1, reg_file_dout2, reg_file_din;
   logic reg_file_we;
 
+  // EXステージ信号の宣言（移行）
   logic [15:0] ex_result_reg;  // Result Register
   logic [15:0] ex_ir;  // Instruction Register
   logic [15:0] ex_result_in;
@@ -204,7 +210,7 @@ module risc16b (
 
 endmodule
 
-
+// 以降は原則触らない
 module reg_file (
     input  wire         clk,
     rst,
