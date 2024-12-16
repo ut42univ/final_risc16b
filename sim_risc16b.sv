@@ -26,8 +26,8 @@ module sim_risc16b;
        #(CLOCK_PERIOD_NS / 2)
          clk = 1'b0;
        #(CLOCK_PERIOD_NS / 2)    
-         print();
-         if (risc16b_inst.if_pc == 16'h0018) begin  
+         // print();
+         if (risc16b_inst.if_pc == 16'h008a) begin  
             print();
 	   dump_and_finish();
 	 end
