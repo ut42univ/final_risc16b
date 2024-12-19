@@ -26,8 +26,8 @@ module risc16b (
 
   // EXステージ信号の宣言（移行）
   logic [15:0] ex_result_reg;  // Result Register
-  logic [15:0] ex_ir;  // Instruction Register
   logic [15:0] ex_result_in;
+  logic [15:0] ex_ir;  // Instruction Register
   logic ex_reg_file_we_in;
   logic ex_reg_file_we_reg;
 
@@ -55,7 +55,7 @@ module risc16b (
   logic [15:0] if_ir;  // Instruction Register
   logic [15:0] if_pc_bta;
   logic        if_pc_we;
-
+  
   always_ff @(posedge clk) begin
     if (rst) if_pc <= 16'd0;
     else if (if_pc_we == 1'b1) if_pc <= if_pc_bta;

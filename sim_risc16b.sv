@@ -118,7 +118,7 @@ module sim_risc16b;
    task dump_and_finish();
       int fp;
       fp= $fopen("sim_risc16b.dump");
-      for (int i = 16'h0000; i <= 16'hffff; i+=8) begin
+      for (int i = 16'hc000; i <= 16'hffff; i+=8) begin
          $fwrite(fp, "%X %X %X %X ", mem[i],   mem[i+1], mem[i+2], mem[i+3]);
 	 $fwrite(fp, "%X %X %X %X\n", mem[i+4], mem[i+5], mem[i+6], mem[i+7]);
       end
