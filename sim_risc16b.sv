@@ -26,8 +26,8 @@ module sim_risc16b;
        #(CLOCK_PERIOD_NS / 2)
          clk = 1'b0;
        #(CLOCK_PERIOD_NS / 2)    
-         // print();
-         if (risc16b_inst.if_pc == 16'h008a) begin  
+         print();
+         if (risc16b_inst.if_pc == 16'h0096) begin  
             print();
 	   dump_and_finish();
 	 end
@@ -79,32 +79,32 @@ module sim_risc16b;
 
    task print(); 
       $write("==== clock: %1d ====\n", $rtoi($time / CLOCK_PERIOD_NS) - 1);
-      $write(" if_pc= %x  if_ir= %b (%x)\n",
-             risc16b_inst.if_pc, risc16b_inst.if_ir, risc16b_inst.if_ir);
-      $write(" i_addr= %x  i_din= %x  i_oe= %b\n", 
-             i_addr, i_din, i_oe);
-      $write(" id_operand_reg1= %x  id_operand_reg2= %x  id_ir= %b (%x)\n",
-             risc16b_inst.id_operand_reg1, risc16b_inst.id_operand_reg2, 
-             risc16b_inst.id_ir, risc16b_inst.id_ir);
-      $write(" id_imm_reg= %x  id_pc= %x\n",
-             risc16b_inst.id_imm_reg, risc16b_inst.id_pc);
-      $write(" reg_file_rnum1= %x, reg_file_rnum2= %x\n",
-             risc16b_inst.reg_file_rnum1, risc16b_inst.reg_file_rnum2);
-      $write(" ex_result_reg= %x  ex_ir= %b (%x)\n", 
-             risc16b_inst.ex_result_reg, 
-             risc16b_inst.ex_ir, risc16b_inst.ex_ir);
-      $write(" alu_ain= %x  alu_bin= %x  alu_op= %04b  alu_dout= %x\n", 
-             risc16b_inst.alu_ain, risc16b_inst.alu_bin, risc16b_inst.alu_op, 
-             risc16b_inst.alu_dout);
-      $write(" d_addr= %x d_din= %x  d_dout= %x  d_oe= %b  d_we= %b\n",
-             risc16b_inst.d_addr, risc16b_inst.d_din, risc16b_inst.d_dout,
-             risc16b_inst.d_oe, risc16b_inst.d_we);
-      $write(" reg_file_wnum= %x  reg_file_din= %x  reg_file_we= %b\n",
-             risc16b_inst.reg_file_wnum, risc16b_inst.reg_file_din, 
-             risc16b_inst.reg_file_we);
-      $write(" if_pc_bta= %x  if_pc_we= %b ", 
-             risc16b_inst.if_pc_bta, risc16b_inst.if_pc_we);
-      $write(" led= %x\n\n", led);
+      // $write(" if_pc= %x  if_ir= %b (%x)\n",
+      //        risc16b_inst.if_pc, risc16b_inst.if_ir, risc16b_inst.if_ir);
+      // $write(" i_addr= %x  i_din= %x  i_oe= %b\n", 
+      //        i_addr, i_din, i_oe);
+      // $write(" id_operand_reg1= %x  id_operand_reg2= %x  id_ir= %b (%x)\n",
+      //        risc16b_inst.id_operand_reg1, risc16b_inst.id_operand_reg2, 
+      //        risc16b_inst.id_ir, risc16b_inst.id_ir);
+      // $write(" id_imm_reg= %x  id_pc= %x\n",
+      //        risc16b_inst.id_imm_reg, risc16b_inst.id_pc);
+      // $write(" reg_file_rnum1= %x, reg_file_rnum2= %x\n",
+      //        risc16b_inst.reg_file_rnum1, risc16b_inst.reg_file_rnum2);
+      // $write(" ex_result_reg= %x  ex_ir= %b (%x)\n", 
+      //        risc16b_inst.ex_result_reg, 
+      //        risc16b_inst.ex_ir, risc16b_inst.ex_ir);
+      // $write(" alu_ain= %x  alu_bin= %x  alu_op= %04b  alu_dout= %x\n", 
+      //        risc16b_inst.alu_ain, risc16b_inst.alu_bin, risc16b_inst.alu_op, 
+      //        risc16b_inst.alu_dout);
+      // $write(" d_addr= %x d_din= %x  d_dout= %x  d_oe= %b  d_we= %b\n",
+      //        risc16b_inst.d_addr, risc16b_inst.d_din, risc16b_inst.d_dout,
+      //        risc16b_inst.d_oe, risc16b_inst.d_we);
+      // $write(" reg_file_wnum= %x  reg_file_din= %x  reg_file_we= %b\n",
+      //        risc16b_inst.reg_file_wnum, risc16b_inst.reg_file_din, 
+      //        risc16b_inst.reg_file_we);
+      // $write(" if_pc_bta= %x  if_pc_we= %b ", 
+      //        risc16b_inst.if_pc_bta, risc16b_inst.if_pc_we);
+      // $write(" led= %x\n\n", led);
 
 
       $write(" regs:");
@@ -118,7 +118,7 @@ module sim_risc16b;
    task dump_and_finish();
       int fp;
       fp= $fopen("sim_risc16b.dump");
-      for (int i = 16'hc000; i <= 16'hffff; i+=8) begin
+      for (int i = 16'h0000; i <= 16'hffff; i+=8) begin
          $fwrite(fp, "%X %X %X %X ", mem[i],   mem[i+1], mem[i+2], mem[i+3]);
 	 $fwrite(fp, "%X %X %X %X\n", mem[i+4], mem[i+5], mem[i+6], mem[i+7]);
       end
