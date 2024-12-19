@@ -69,27 +69,12 @@ module risc16b (
   logic [15:0] id_ir;  // Instruction Register
   logic [15:0] id_imm_reg;
   logic [15:0] id_pc;
-
-// added
   logic [15:0] id_operand_in1;
   logic [15:0] id_imm_in;
 
   assign reg_file_rnum1 = if_ir[10:8];
   assign reg_file_rnum2 = if_ir[7:5];
 
-// deleted
-//   always_ff @(posedge clk) begin
-//     if (rst) id_operand_reg1 <= 16'd0;
-//     // forward EX
-//     else if ((ex_reg_file_we_in == 1'b1) && (id_ir[10:8] == reg_file_rnum1))
-//       id_operand_reg1 <= ex_result_in;
-//     // forward WB
-//     else if ((ex_reg_file_we_in == 1'b1) && (ex_ir[10:8] == reg_file_rnum1))
-//       id_operand_reg1 <= ex_result_reg;
-//     else id_operand_reg1 <= reg_file_dout1;
-//   end
-
-// added
   always_comb begin
     // forward EX
     if ((ex_reg_file_we_in == 1'b1) && (id_ir[10:8] == reg_file_rnum1))
@@ -100,7 +85,6 @@ module risc16b (
     else id_operand_in1 = reg_file_dout1;
   end
 
-// added
   always_ff @(posedge clk) begin
     if (rst) id_operand_reg1 <= 16'd0;
     else id_operand_reg1 <= id_operand_in1;
@@ -122,20 +106,11 @@ module risc16b (
     else id_ir <= if_ir;
   end
 
-// deleted
-//   always_ff @(posedge clk) begin
-//     if (rst) id_imm_reg <= 16'd0;
-//     else if (if_ir[15:11] == 5'b00100 || if_ir[15] == 1) id_imm_reg <= {{8{if_ir[7]}}, if_ir[7:0]};
-//     else id_imm_reg <= {8'b0, if_ir[7:0]};
-//   end
-
-// added
   always_comb begin
     if (if_ir[15:11] == 5'b00100 || if_ir[15] == 1) id_imm_in = {{8{if_ir[7]}}, if_ir[7:0]};
     else id_imm_in = {8'b0, if_ir[7:0]};
   end
 
-// added
     always_ff @(posedge clk) begin
         if (rst) id_imm_reg <= 16'd0;
         else id_imm_reg <= id_imm_in;
@@ -146,27 +121,22 @@ module risc16b (
     else id_pc <= if_pc;
   end
 
-// added
-    always_comb begin
-        case (if_ir[15:11])
-            5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;
-            5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;
-            5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;
-            5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;
-            5'b11000: if_pc_we = 1'b1;
-            default:  if_pc_we = 1'b0;
-        endcase
-    end
+  always_comb begin
+      case (if_ir[15:11])
+          5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;
+          5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;
+          5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;
+          5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;
+          5'b11000: if_pc_we = 1'b1;
+          default:  if_pc_we = 1'b0;
+      endcase
+  end
 
-// added
 assign if_pc_bta = if_pc + id_imm_in;
 
 
 
   // EX (Exectution)
-//   deleted
-//   logic [15:0] ex_operand_reg1;
-
   assign alu_ain = (id_ir[15] == 1'b1) ? id_pc : id_operand_reg1;
   assign alu_bin = (id_ir[15:11] == 5'b00000) ? id_operand_reg2 : id_imm_reg;
 
@@ -222,12 +192,6 @@ assign if_pc_bta = if_pc + id_imm_in;
     else ex_ir <= id_ir;
   end
 
-// deleted
-//   always_ff @(posedge clk) begin
-//     if (rst) ex_operand_reg1 <= 16'd0;
-//     else ex_operand_reg1 <= id_operand_reg1;
-//   end
-
   assign ex_reg_file_we_in = (
     (id_ir == 16'h0000) || //nop
     (id_ir[15] == 1'b1) || //branch
@@ -243,21 +207,6 @@ assign if_pc_bta = if_pc + id_imm_in;
   assign reg_file_wnum = ex_ir[10:8];
   assign reg_file_din = ex_result_reg;
   assign reg_file_we = ex_reg_file_we_reg;
-
-// deleted
-//   assign if_pc_bta = ex_result_reg;
-
-// deleted
-//   always_comb begin
-//     case (ex_ir[15:11])
-//       5'b10000: if_pc_we = (ex_operand_reg1 == 0) ? 1'b1 : 1'b0;
-//       5'b10001: if_pc_we = (ex_operand_reg1 != 0) ? 1'b1 : 1'b0;
-//       5'b10010: if_pc_we = (ex_operand_reg1[15] == 1) ? 1'b1 : 1'b0;
-//       5'b10011: if_pc_we = (ex_operand_reg1[15] != 1) ? 1'b1 : 1'b0;
-//       5'b11000: if_pc_we = 1'b1;
-//       default:  if_pc_we = 1'b0;
-//     endcase
-//   end
 
 endmodule
 
