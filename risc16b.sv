@@ -181,13 +181,14 @@ module risc16b (
 
   always_comb begin
     if (rst) ex_result_in = 16'd0;
-    else if (id_ir[4:0] == 5'b10001)  // lw
-      ex_result_in = d_din;
-    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b0)  // lbu even
-      ex_result_in = {{8'b0}, d_din[15:8]};
-    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b1)  // lbu odd
-      ex_result_in = {{8'b0}, d_din[7:0]};
-    else ex_result_in = alu_dout;
+    else begin
+      casez ({id_ir[4:0], id_operand_reg2[0]})
+        6'b10001?: ex_result_in = d_din;                // lw
+        6'b100110: ex_result_in = {{8'b0}, d_din[15:8]}; // lbu even
+        6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
+        default:   ex_result_in = alu_dout;
+      endcase
+    end
   end
 
   always_ff @(posedge clk) begin
@@ -206,7 +207,7 @@ module risc16b (
       ) ? 1'b0 : 1'b1;
 
   always_ff @(posedge clk) begin
-    if (rst) ex_reg_file_we_reg <= 16'd0;
+    if (rst) ex_reg_file_we_reg <= 1'b0;
     else ex_reg_file_we_reg <= ex_reg_file_we_in;
   end
 
@@ -263,6 +264,8 @@ module alu16 (
       4'b1001: dout = bin >> 1;
       4'b1010: dout = ain & bin;
       4'b1011: dout = ain | bin;
+      4'b1100: dout = ain << 2; // shift left 2 bits (original)
+      4'b1101: dout = ain >> 2; // shift right 2` bits (original)
       default: dout = 16'b0;
     endcase
   end
