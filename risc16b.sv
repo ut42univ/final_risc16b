@@ -132,11 +132,11 @@ module risc16b (
 
   always_comb begin
     case (if_ir[15:11])
-      5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;
-      5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;
-      5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;
-      5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;
-      5'b11000: if_pc_we = 1'b1;
+      5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;       // beqz
+      5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;       // bnez
+      // 5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;   // bmi
+      // 5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;   // bpl
+      // 5'b11000: if_pc_we = 1'b1;                                      // j  
       default:  if_pc_we = 1'b0;
     endcase
   end
@@ -252,20 +252,20 @@ module alu16 (
 
   always_comb begin
     case (op)
-      4'b0000: dout = ain;
-      4'b0001: dout = bin;
-      4'b0010: dout = ~bin;
-      4'b0011: dout = ain ^ bin;
-      4'b0100: dout = ain + bin;
-      4'b0101: dout = ain - bin;
-      4'b0110: dout = bin << 8;
-      4'b0111: dout = bin >> 8;
-      4'b1000: dout = bin << 1;
-      4'b1001: dout = bin >> 1;
-      4'b1010: dout = ain & bin;
-      4'b1011: dout = ain | bin;
-      4'b1100: dout = ain << 2; // shift left 2 bits (original)
-      4'b1101: dout = ain >> 2; // shift right 2` bits (original)
+      4'b0000: dout = ain;        // nop
+      4'b0001: dout = bin;        // mov
+      // 4'b0010: dout = ~bin;       // not
+      // 4'b0011: dout = ain ^ bin;  // xor
+      4'b0100: dout = ain + bin;  // add
+      4'b0101: dout = ain - bin;  // sub
+      4'b0110: dout = bin << 8;   // shift left 8 bits
+      4'b0111: dout = bin >> 8;   // shift right 8 bits
+      // 4'b1000: dout = bin << 1;   // shift left 1 bit
+      4'b1001: dout = bin >> 1;   // shift right 1 bit
+      4'b1010: dout = ain & bin;  // and
+      // 4'b1011: dout = ain | bin;  // or
+      // 4'b1100: dout = ain << 2; // shift left 2 bits (original)
+      // 4'b1101: dout = ain >> 2; // shift right 2 bits (original)
       default: dout = 16'b0;
     endcase
   end
