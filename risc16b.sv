@@ -3,22 +3,30 @@
 module risc16b (
     input  wire         clk,
     input  wire         rst,
+
+    // 命令メモリインターフェース
     output logic [15:0] i_addr,
     output logic        i_oe,
     input  wire  [15:0] i_din,
     output logic [15:0] d_addr,
+
+    // データメモリインターフェース
     output logic        d_oe,
     input  wire  [15:0] d_din,
     output logic [15:0] d_dout,
     output logic [ 1:0] d_we
 );
 
+  // ALU信号の宣言
   logic [15:0] alu_ain, alu_bin, alu_dout;
   logic [3:0] alu_op;
+
+  // レジスタファイル信号の宣言
   logic [2:0] reg_file_rnum1, reg_file_rnum2, reg_file_wnum;
   logic [15:0] reg_file_dout1, reg_file_dout2, reg_file_din;
   logic reg_file_we;
 
+  // EXステージ信号の宣言（移行）
   logic [15:0] ex_result_reg;  // Result Register
   logic [15:0] ex_ir;  // Instruction Register
   logic [15:0] ex_result_in;
@@ -50,6 +58,9 @@ module risc16b (
   logic [15:0] if_pc_bta;
   logic        if_pc_we;
 
+  assign i_oe   = 1'b1;
+  assign i_addr = if_pc;
+
   always_ff @(posedge clk) begin
     if (rst) if_pc <= 16'd0;
     else if (if_pc_we == 1'b1) if_pc <= if_pc_bta;
@@ -61,8 +72,6 @@ module risc16b (
     else if_ir <= i_din;
   end
 
-  assign i_oe   = 1'b1;
-  assign i_addr = if_pc;
 
   // ID (Instruction Decode)
   logic [15:0] id_operand_reg1, id_operand_reg2;  // Operand Registers
@@ -111,10 +120,10 @@ module risc16b (
     else id_imm_in = {8'b0, if_ir[7:0]};
   end
 
-    always_ff @(posedge clk) begin
-        if (rst) id_imm_reg <= 16'd0;
-        else id_imm_reg <= id_imm_in;
-    end
+  always_ff @(posedge clk) begin
+    if (rst) id_imm_reg <= 16'd0;
+    else id_imm_reg <= id_imm_in;
+  end
 
   always_ff @(posedge clk) begin
     if (rst) id_pc <= 16'd0;
@@ -122,17 +131,17 @@ module risc16b (
   end
 
   always_comb begin
-      case (if_ir[15:11])
-          5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;
-          5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;
-          5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;
-          5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;
-          5'b11000: if_pc_we = 1'b1;
-          default:  if_pc_we = 1'b0;
-      endcase
+    case (if_ir[15:11])
+      5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;
+      5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;
+      5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;
+      5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;
+      5'b11000: if_pc_we = 1'b1;
+      default:  if_pc_we = 1'b0;
+    endcase
   end
 
-assign if_pc_bta = if_pc + id_imm_in;
+  assign if_pc_bta = if_pc + id_imm_in;
 
 
 
@@ -148,19 +157,18 @@ assign if_pc_bta = if_pc + id_imm_in;
     )) ? 1'b1 : 1'b0;
 
   always_comb begin
-    if (d_we == 2'b11) // sw
+    if (d_we == 2'b11)  // sw
       d_dout = id_operand_reg1;
-    else if (d_we == 2'b01) // sbu even
-      d_dout = {id_operand_reg1[7:0],{8'b0}};
-    else if (d_we == 2'b10) // sbu odd
-      d_dout = {{8'b0},id_operand_reg1[7:0]};
-    else
-      d_dout = 16'b0;
+    else if (d_we == 2'b01)  // sbu even
+      d_dout = {id_operand_reg1[7:0], {8'b0}};
+    else if (d_we == 2'b10)  // sbu odd
+      d_dout = {{8'b0}, id_operand_reg1[7:0]};
+    else d_dout = 16'b0;
   end
 
   always_comb begin
-    if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10000) d_we = 2'b11; // sw
-    else if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10010) // sbu
+    if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10000) d_we = 2'b11;  // sw
+    else if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10010)  // sbu
       d_we = (id_operand_reg2[0] == 1'b0) ? 2'b01 : 2'b10;
     else d_we = 2'b00;
   end
@@ -173,12 +181,12 @@ assign if_pc_bta = if_pc + id_imm_in;
 
   always_comb begin
     if (rst) ex_result_in = 16'd0;
-    else if (id_ir[4:0] == 5'b10001) // lw
+    else if (id_ir[4:0] == 5'b10001)  // lw
       ex_result_in = d_din;
-    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b0) // lbu even
-      ex_result_in = {{8'b0},d_din[15:8]};
-    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b1) // lbu odd
-      ex_result_in = {{8'b0},d_din[7:0]};
+    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b0)  // lbu even
+      ex_result_in = {{8'b0}, d_din[15:8]};
+    else if (id_ir[4:0] == 5'b10011 && id_operand_reg2[0] == 1'b1)  // lbu odd
+      ex_result_in = {{8'b0}, d_din[7:0]};
     else ex_result_in = alu_dout;
   end
 
@@ -192,11 +200,10 @@ assign if_pc_bta = if_pc + id_imm_in;
     else ex_ir <= id_ir;
   end
 
-  assign ex_reg_file_we_in = (
-    (id_ir == 16'h0000) || //nop
-    (id_ir[15] == 1'b1) || //branch
-    (d_we != 2'b00) //not sw or sbu
-    ) ? 1'b0 : 1'b1;
+  assign ex_reg_file_we_in = ((id_ir == 16'h0000) ||  //nop
+      (id_ir[15] == 1'b1) ||  //branch
+      (d_we != 2'b00)  //not sw or sbu
+      ) ? 1'b0 : 1'b1;
 
   always_ff @(posedge clk) begin
     if (rst) ex_reg_file_we_reg <= 16'd0;
@@ -205,8 +212,8 @@ assign if_pc_bta = if_pc + id_imm_in;
 
   // WB (Write Back)
   assign reg_file_wnum = ex_ir[10:8];
-  assign reg_file_din = ex_result_reg;
-  assign reg_file_we = ex_reg_file_we_reg;
+  assign reg_file_din  = ex_result_reg;
+  assign reg_file_we   = ex_reg_file_we_reg;
 
 endmodule
 
