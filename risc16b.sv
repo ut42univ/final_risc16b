@@ -281,8 +281,8 @@ module alu16 (
       // 4'b1011: dout = ain | bin;  // or
       // 4'b1100: dout = ain << 2; // shift left 2 bits (original)
       4'b1101: dout = ain >> 2;  // shift right 2 bits (original)
-      4'b1110: dout = bin & 16'h00fe;  // even lower 8 bits
-      4'b1111: dout = (bin >> 8) & 16'h00fe;  // even upper 8 bits
+      4'b1110: dout = (bin & 16'h00fe) + 16'hc000;  // even lower 8 bits and add 0xc000 (original)
+      4'b1111: dout = ((bin >> 8) & 16'h00fe) + 16'hc000;  // even upper 8 bits and add 0xc000 (original)
       default: dout = 16'b0;
     endcase
   end
