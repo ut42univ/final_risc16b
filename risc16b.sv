@@ -120,8 +120,7 @@ module risc16b (
 
   // 即値展開
   always_comb begin
-    if (if_ir[15:11] == 5'b00100 || if_ir[15] == 1) id_imm_in = {{8{if_ir[7]}}, if_ir[7:0]};
-    else id_imm_in = {8'b0, if_ir[7:0]};
+    id_imm_in = (if_ir[15:11] == 5'b00100 || if_ir[15]) ? {{8{if_ir[7]}}, if_ir[7:0]} : {8'b0, if_ir[7:0]};
   end
 
   always_ff @(posedge clk) begin
@@ -154,14 +153,7 @@ module risc16b (
 
   // データメモリ アドレス＆OE
   assign d_addr = id_operand_reg2;
-  assign d_oe = (
-    (id_ir[15:11] == 5'b00000) &&
-    (
-      (id_ir[4:0] == 5'b10001) || 
-      (id_ir[4:0] == 5'b10011 ) || 
-      (id_ir[4:0] == 5'b10101)
-    )
-  ) ? 1'b1 : 1'b0;
+  assign d_oe = (id_ir[15:11] == 5'b00000) && (id_ir[4:0] == 5'b10001 || id_ir[4:0] == 5'b10011 || id_ir[4:0] == 5'b10101);
 
   // データメモリ 書き込みデータ
   always_comb begin
@@ -171,13 +163,13 @@ module risc16b (
     else d_dout = 16'b0;
   end
 
-  // データメモリ 書き込み制御(s.w, s.bu)
+  // データメモリ 書き込み制御(sw, sbu)
   always_comb begin
-    if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10000) d_we = 2'b11;  // sw
-    else if (id_ir[15:11] == 5'b00000 && id_ir[4:0] == 5'b10010) begin
-      // s.bu
-      d_we = (id_operand_reg2[0] == 1'b0) ? 2'b01 : 2'b10;
-    end else d_we = 2'b00;
+    casez ({id_ir[15:11], id_ir[4:0]})
+      10'b00000_10000: d_we = 2'b11;  // sw
+      10'b00000_10010: d_we = (id_operand_reg2[0]) ? 2'b10 : 2'b01;  // sbu
+      default:         d_we = 2'b00;
+    endcase
   end
 
   // ALU演算種別
@@ -190,22 +182,14 @@ module risc16b (
   // EX結果(パイプライン内部フォワード)
   always_comb begin
     if (rst) ex_result_in = 16'd0;
-    else begin
-      // dec_bnez: (rX - 1)
-      if (id_ir[15:11] == 5'b10001) begin
-        ex_result_in = id_operand_reg1 - 16'd1;
-      end else begin
-        casez ({
-          id_ir[4:0], id_operand_reg2[0]
-        })
-          6'b10001?: ex_result_in = d_din;  // lw
-          6'b100110: ex_result_in = {{8'b0}, d_din[15:8]};  // lbu even
-          6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
-          6'b10101?: ex_result_in = d_din + 16'd1;  // lw_inc
-          default:   ex_result_in = alu_dout;
-        endcase
-      end
-    end
+    else if (id_ir[15:11] == 5'b10001) ex_result_in = id_operand_reg1 - 16'd1;  // dec_bnez
+    else casez ({id_ir[4:0], id_operand_reg2[0]})
+      6'b10001?: ex_result_in = d_din;  // lw
+      6'b100110: ex_result_in = {{8'b0}, d_din[15:8]};  // lbu even
+      6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
+      6'b10101?: ex_result_in = d_din + 16'd1;  // lw_inc
+      default:   ex_result_in = alu_dout;
+    endcase
   end
 
   always_ff @(posedge clk) begin
@@ -286,8 +270,8 @@ module alu16 (
       4'b0111: dout = bin >> 8;  // shift right 8
       4'b1010: dout = ain & bin;  // and
       4'b1101: dout = ain >> 2;  // shift right 2 (original)
-      4'b1110: dout = (bin & 16'h00FE) + 16'hC000;  // original
-      4'b1111: dout = ((bin >> 8) & 16'h00FE) + 16'hC000;
+      4'b1110: dout = (bin & 16'h00FE) + 16'hC000;  // even lower 8 bits and add 0xC000 (original)
+      4'b1111: dout = ((bin >> 8) & 16'h00FE) + 16'hC000; // even upper 8 bits and add 0xC000 (original)
       default: dout = 16'b0;
     endcase
   end
