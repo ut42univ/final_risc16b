@@ -172,7 +172,7 @@ module risc16b (
 
   // EX結果の最適化
   always_comb begin
-    ex_result_in = (id_ir[15:11] == 5'b10001) ? id_operand_reg1 - 16'd1 :　// dec_bnez
+    ex_result_in = (id_ir[15:11] == 5'b10001) ? id_operand_reg1 - 16'd1 : // dec_bnez
                    (id_ir[15:11] == 5'b00000) ? 
                    ((id_ir[4:0] == 5'b10001) ? d_din : // lw
                     (id_ir[4:0] == 5'b10011) ? {8'b0, id_operand_reg2[0] ? d_din[7:0] : d_din[15:8]} : // lbu
