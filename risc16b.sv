@@ -154,7 +154,7 @@ module risc16b (
   assign d_oe = (
     (id_ir[15:11] == 5'b00000) &&
     (
-      (id_ir[4:0] == 5'b10001) || (id_ir[4:0] == 5'b10011) //lw or lbu?
+      (id_ir[4:0] == 5'b10001) || (id_ir[4:0] == 5'b10011 ) || (id_ir[4:0] == 5'b10101) //lw or lbu or lw_inc(original)?
     )) ? 1'b1 : 1'b0;
 
   always_comb begin
@@ -194,6 +194,7 @@ module risc16b (
           6'b10001?: ex_result_in = d_din;  // lw
           6'b100110: ex_result_in = {{8'b0}, d_din[15:8]};  // lbu even
           6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
+          6'b10101?: ex_result_in = d_din + 16'd1;  // lw_inc(original)
           default:   ex_result_in = alu_dout;
         endcase
       end
