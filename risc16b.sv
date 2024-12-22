@@ -275,11 +275,13 @@ module alu16 (
       4'b0110: dout = bin << 8;  // shift left 8 bits
       4'b0111: dout = bin >> 8;  // shift right 8 bits
       // 4'b1000: dout = bin << 1;   // shift left 1 bit
-      4'b1001: dout = bin >> 1;  // shift right 1 bit
+      // 4'b1001: dout = bin >> 1;  // shift right 1 bit
       4'b1010: dout = ain & bin;  // and
       // 4'b1011: dout = ain | bin;  // or
       // 4'b1100: dout = ain << 2; // shift left 2 bits (original)
       4'b1101: dout = ain >> 2;  // shift right 2 bits (original)
+      4'b1110: dout = bin & 16'h00fe;  // even lower 8 bits
+      4'b1111: dout = (bin >> 8) & 16'h00fe;  // even upper 8 bits
       default: dout = 16'b0;
     endcase
   end
