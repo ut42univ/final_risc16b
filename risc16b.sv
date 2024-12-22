@@ -67,8 +67,7 @@ module risc16b (
 
   always_ff @(posedge clk) begin
     if (rst) if_pc <= 16'd0;
-    else if (if_pc_we) if_pc <= if_pc_bta;
-    else if_pc <= if_pc + 16'd2;
+    else if_pc <= if_pc_we ? if_pc_bta : (if_pc + 16'd2);
   end
 
   always_ff @(posedge clk) begin
@@ -89,13 +88,14 @@ module risc16b (
   assign reg_file_rnum1 = if_ir[10:8];
   assign reg_file_rnum2 = if_ir[7:5];
 
-  // フォワーディング(operand1)
+  // フォワーディングロジックの最適化
   always_comb begin
-    if ((ex_reg_file_we_in == 1'b1) && (id_ir[10:8] == reg_file_rnum1))
+    id_operand_in1 = reg_file_dout1;
+    if (ex_reg_file_we_in && (id_ir[10:8] == reg_file_rnum1)) begin
       id_operand_in1 = ex_result_in;
-    else if ((ex_reg_file_we_in == 1'b1) && (ex_ir[10:8] == reg_file_rnum1))
+    end else if (ex_reg_file_we_reg && (ex_ir[10:8] == reg_file_rnum1)) begin
       id_operand_in1 = ex_result_reg;
-    else id_operand_in1 = reg_file_dout1;
+    end
   end
 
   always_ff @(posedge clk) begin
@@ -119,8 +119,13 @@ module risc16b (
   end
 
   // 即値展開
+  function [15:0] sign_extend_8(input [7:0] val);
+    sign_extend_8 = {{8{val[7]}}, val};
+  endfunction
+
   always_comb begin
-    id_imm_in = (if_ir[15:11] == 5'b00100 || if_ir[15]) ? {{8{if_ir[7]}}, if_ir[7:0]} : {8'b0, if_ir[7:0]};
+    id_imm_in = (if_ir[15:11] == 5'b00100 || if_ir[15]) ?
+        sign_extend_8(if_ir[7:0]) : {8'b0, if_ir[7:0]};
   end
 
   always_ff @(posedge clk) begin
@@ -134,12 +139,13 @@ module risc16b (
     else id_pc <= if_pc;
   end
 
-  // 分岐判定 (beqz, dec_bnez のみ)
+  // 分岐判定の最適化
   always_comb begin
-    case (if_ir[15:11])
-      5'b10000: if_pc_we = (id_operand_in1 == 16'd0) ? 1'b1 : 1'b0;
-      5'b10001: if_pc_we = ((id_operand_in1 - 16'd1) != 16'd0) ? 1'b1 : 1'b0;
-      default:  if_pc_we = 1'b0;
+    if_pc_we = 1'b0;
+    unique case (if_ir[15:11])
+      5'b10000: if_pc_we = (id_operand_in1 == '0);  // beqz
+      5'b10001: if_pc_we = (id_operand_in1 != 16'd1);  // dec_bnez
+      default:  ;
     endcase
   end
 
@@ -163,13 +169,16 @@ module risc16b (
     else d_dout = 16'b0;
   end
 
-  // データメモリ 書き込み制御(sw, sbu)
+  // メモリアクセスロジックの最適化
   always_comb begin
-    casez ({id_ir[15:11], id_ir[4:0]})
-      10'b00000_10000: d_we = 2'b11;  // sw
-      10'b00000_10010: d_we = (id_operand_reg2[0]) ? 2'b10 : 2'b01;  // sbu
-      default:         d_we = 2'b00;
-    endcase
+    d_we = 2'b00;
+    if (id_ir[15:11] == 5'b00000) begin
+      unique case (id_ir[4:0])
+        5'b10000: d_we = 2'b11;  // sw
+        5'b10010: d_we = id_operand_reg2[0] ? 2'b10 : 2'b01;  // sbu
+        default:  ;
+      endcase
+    end
   end
 
   // ALU演算種別
@@ -179,17 +188,20 @@ module risc16b (
     else alu_op = id_ir[14:11];
   end
 
-  // EX結果(パイプライン内部フォワード)
+  // EX結果の最適化
   always_comb begin
-    if (rst) ex_result_in = 16'd0;
-    else if (id_ir[15:11] == 5'b10001) ex_result_in = id_operand_reg1 - 16'd1;  // dec_bnez
-    else casez ({id_ir[4:0], id_operand_reg2[0]})
-      6'b10001?: ex_result_in = d_din;  // lw
-      6'b100110: ex_result_in = {{8'b0}, d_din[15:8]};  // lbu even
-      6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
-      6'b10101?: ex_result_in = d_din + 16'd1;  // lw_inc
-      default:   ex_result_in = alu_dout;
-    endcase
+    ex_result_in = alu_dout;  // デフォルト値
+
+    if (id_ir[15:11] == 5'b10001) begin
+      ex_result_in = id_operand_reg1 - 16'd1;  // dec_bnez
+    end else if (id_ir[15:11] == 5'b00000) begin
+      unique case (id_ir[4:0])
+        5'b10001: ex_result_in = d_din;  // lw
+        5'b10011: ex_result_in = {8'b0, id_operand_reg2[0] ? d_din[7:0] : d_din[15:8]};  // lbu
+        5'b10101: ex_result_in = d_din + 16'd1;  // lw_inc
+        default:  ;
+      endcase
+    end
   end
 
   always_ff @(posedge clk) begin
@@ -202,14 +214,15 @@ module risc16b (
     else ex_ir <= id_ir;
   end
 
-  // 次ステージ（WB）向け レジスタファイル書き込み制御
+  // レジスタファイル書き込み制御の最適化
   always_comb begin
-    casez (id_ir)
-      16'h0000:             ex_reg_file_we_in = 1'b0;  // nop
-      16'b10001???????????: ex_reg_file_we_in = 1'b1;  // dec_bnez
-      16'b1???????????????: ex_reg_file_we_in = 1'b0;  // 分岐命令（beqz等）
-      default:              ex_reg_file_we_in = (d_we != 2'b00) ? 1'b0 : 1'b1;
-    endcase
+    ex_reg_file_we_in = 1'b1;  // デフォルトで書き込み有効
+
+    if (id_ir == 16'h0000 ||  // nop
+        id_ir[15] && id_ir[15:11] != 5'b10001 ||  // 分岐命令（dec_bnez以外）
+        d_we != 2'b00) begin  // ストア命令
+      ex_reg_file_we_in = 1'b0;
+    end
   end
 
   always_ff @(posedge clk) begin
@@ -271,7 +284,7 @@ module alu16 (
       4'b1010: dout = ain & bin;  // and
       4'b1101: dout = ain >> 2;  // shift right 2 (original)
       4'b1110: dout = (bin & 16'h00FE) + 16'hC000;  // even lower 8 bits and add 0xC000 (original)
-      4'b1111: dout = ((bin >> 8) & 16'h00FE) + 16'hC000; // even upper 8 bits and add 0xC000 (original)
+      4'b1111: dout = ((bin >> 8) & 16'h00FE) + 16'hC000;  // even upper 8 bits and add 0xC000 (original)
       default: dout = 16'b0;
     endcase
   end
