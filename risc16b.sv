@@ -1,8 +1,8 @@
 `default_nettype none
 
 module risc16b (
-    input  wire         clk,
-    input  wire         rst,
+    input wire clk,
+    input wire rst,
 
     // 命令メモリインターフェース
     output logic [15:0] i_addr,
@@ -132,8 +132,11 @@ module risc16b (
 
   always_comb begin
     case (if_ir[15:11])
-      5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;       // beqz
-      5'b10001: if_pc_we = (id_operand_in1 != 0) ? 1'b1 : 1'b0;       // bnez
+      5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;  // beqz
+      5'b10001: begin  // dec_bnez (従来はbnez)
+        // dec_bnez では「(rX - 1) != 0」なら分岐
+        if_pc_we = ((id_operand_in1 - 16'd1) != 16'd0) ? 1'b1 : 1'b0;
+      end
       // 5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;   // bmi
       // 5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;   // bpl
       // 5'b11000: if_pc_we = 1'b1;                                      // j  
@@ -182,12 +185,20 @@ module risc16b (
   always_comb begin
     if (rst) ex_result_in = 16'd0;
     else begin
-      casez ({id_ir[4:0], id_operand_reg2[0]})
-        6'b10001?: ex_result_in = d_din;                // lw
-        6'b100110: ex_result_in = {{8'b0}, d_din[15:8]}; // lbu even
-        6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
-        default:   ex_result_in = alu_dout;
-      endcase
+      // dec_bnez のオペコード: 5'b10001
+      if (id_ir[15:11] == 5'b10001) begin
+        // dec_bnez: (rX - 1) を書き戻したい
+        ex_result_in = id_operand_reg1 - 16'd1;
+      end else begin
+        casez ({
+          id_ir[4:0], id_operand_reg2[0]
+        })
+          6'b10001?: ex_result_in = d_din;  // lw
+          6'b100110: ex_result_in = {{8'b0}, d_din[15:8]};  // lbu even
+          6'b100111: ex_result_in = {{8'b0}, d_din[7:0]};  // lbu odd
+          default:   ex_result_in = alu_dout;
+        endcase
+      end
     end
   end
 
@@ -201,10 +212,25 @@ module risc16b (
     else ex_ir <= id_ir;
   end
 
-  assign ex_reg_file_we_in = ((id_ir == 16'h0000) ||  //nop
-      (id_ir[15] == 1'b1) ||  //branch
-      (d_we != 2'b00)  //not sw or sbu
-      ) ? 1'b0 : 1'b1;
+  always_comb begin
+    if (id_ir == 16'h0000) begin
+      // nop
+      ex_reg_file_we_in = 1'b0;
+    end else if (id_ir[15:11] == 5'b10001) begin
+      // dec_bnez (特別扱い; ブランチだがレジスタ書き込みをする)
+      ex_reg_file_we_in = 1'b1;
+    end else if (id_ir[15] == 1'b1) begin
+      // 他の branch 系 (beqz / bmi / bpl / jなど)
+      ex_reg_file_we_in = 1'b0;
+    end else if (d_we != 2'b00) begin
+      // store (sw / sbu)
+      ex_reg_file_we_in = 1'b0;
+    end else begin
+      // 上記以外 (普通の演算 / lw / lbuなど) は書き込み
+      ex_reg_file_we_in = 1'b1;
+    end
+  end
+
 
   always_ff @(posedge clk) begin
     if (rst) ex_reg_file_we_reg <= 1'b0;
@@ -252,20 +278,20 @@ module alu16 (
 
   always_comb begin
     case (op)
-      4'b0000: dout = ain;        // nop
-      4'b0001: dout = bin;        // mov
+      4'b0000: dout = ain;  // nop
+      4'b0001: dout = bin;  // mov
       // 4'b0010: dout = ~bin;       // not
       // 4'b0011: dout = ain ^ bin;  // xor
       4'b0100: dout = ain + bin;  // add
       4'b0101: dout = ain - bin;  // sub
-      4'b0110: dout = bin << 8;   // shift left 8 bits
-      4'b0111: dout = bin >> 8;   // shift right 8 bits
+      4'b0110: dout = bin << 8;  // shift left 8 bits
+      4'b0111: dout = bin >> 8;  // shift right 8 bits
       // 4'b1000: dout = bin << 1;   // shift left 1 bit
-      4'b1001: dout = bin >> 1;   // shift right 1 bit
+      4'b1001: dout = bin >> 1;  // shift right 1 bit
       4'b1010: dout = ain & bin;  // and
       // 4'b1011: dout = ain | bin;  // or
       // 4'b1100: dout = ain << 2; // shift left 2 bits (original)
-      4'b1101: dout = ain >> 2; // shift right 2 bits (original)
+      4'b1101: dout = ain >> 2;  // shift right 2 bits (original)
       default: dout = 16'b0;
     endcase
   end
