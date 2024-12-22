@@ -133,10 +133,8 @@ module risc16b (
   always_comb begin
     case (if_ir[15:11])
       5'b10000: if_pc_we = (id_operand_in1 == 0) ? 1'b1 : 1'b0;  // beqz
-      5'b10001: begin  // dec_bnez (従来はbnez)
-        // dec_bnez では「(rX - 1) != 0」なら分岐
-        if_pc_we = ((id_operand_in1 - 16'd1) != 16'd0) ? 1'b1 : 1'b0;
-      end
+      // dec_bnez では「(rX - 1) != 0」なら分岐
+      5'b10001: if_pc_we = ((id_operand_in1 - 16'd1) != 16'd0) ? 1'b1 : 1'b0; // dec_bnez (従来はbnez)
       // 5'b10010: if_pc_we = (id_operand_in1[15] == 1) ? 1'b1 : 1'b0;   // bmi
       // 5'b10011: if_pc_we = (id_operand_in1[15] != 1) ? 1'b1 : 1'b0;   // bpl
       // 5'b11000: if_pc_we = 1'b1;                                      // j  
@@ -186,10 +184,10 @@ module risc16b (
     if (rst) ex_result_in = 16'd0;
     else begin
       // dec_bnez のオペコード: 5'b10001
-      if (id_ir[15:11] == 5'b10001) begin
+      if (id_ir[15:11] == 5'b10001)
         // dec_bnez: (rX - 1) を書き戻したい
         ex_result_in = id_operand_reg1 - 16'd1;
-      end else begin
+      else begin
         casez ({
           id_ir[4:0], id_operand_reg2[0]
         })
@@ -213,22 +211,12 @@ module risc16b (
   end
 
   always_comb begin
-    if (id_ir == 16'h0000) begin
-      // nop
-      ex_reg_file_we_in = 1'b0;
-    end else if (id_ir[15:11] == 5'b10001) begin
-      // dec_bnez (特別扱い; ブランチだがレジスタ書き込みをする)
-      ex_reg_file_we_in = 1'b1;
-    end else if (id_ir[15] == 1'b1) begin
-      // 他の branch 系 (beqz / bmi / bpl / jなど)
-      ex_reg_file_we_in = 1'b0;
-    end else if (d_we != 2'b00) begin
-      // store (sw / sbu)
-      ex_reg_file_we_in = 1'b0;
-    end else begin
-      // 上記以外 (普通の演算 / lw / lbuなど) は書き込み
-      ex_reg_file_we_in = 1'b1;
-    end
+    casez (id_ir)
+      16'h0000: ex_reg_file_we_in = 1'b0; // nop
+      16'b10001???????????: ex_reg_file_we_in = 1'b1; // dec_bnez(従来はbnez, 特別扱い)
+      16'b1???????????????: ex_reg_file_we_in = 1'b0; // branch instructions
+      default: ex_reg_file_we_in = (d_we != 2'b00) ? 1'b0 : 1'b1; // store or others
+    endcase
   end
 
 
