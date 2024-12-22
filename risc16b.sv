@@ -265,7 +265,7 @@ module alu16 (
       4'b1010: dout = ain & bin;  // and
       // 4'b1011: dout = ain | bin;  // or
       // 4'b1100: dout = ain << 2; // shift left 2 bits (original)
-      // 4'b1101: dout = ain >> 2; // shift right 2 bits (original)
+      4'b1101: dout = ain >> 2; // shift right 2 bits (original)
       default: dout = 16'b0;
     endcase
   end
